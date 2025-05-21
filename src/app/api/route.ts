@@ -9,12 +9,10 @@ dotenv.config();
 // ————————————————
 // Environment & Wallet Setup
 // ————————————————
-const RPC_URL = process.env.RPC_URL || 'http://localhost:8545';
-const OWNER_PRIVATE_KEY = process.env.PRIVATE_KEY!;
-const FAUCET_AMOUNT = process.env.FAUCET_AMOUNT || '0.1';
+// const RPC_URL = process.env.RPC_URL || 'http://localhost:8545';
+// const OWNER_PRIVATE_KEY = process.env.PRIVATE_KEY!;
+// const FAUCET_AMOUNT = process.env.FAUCET_AMOUNT || '0.1';
 
-const provider = new ethers.JsonRpcProvider(RPC_URL);
-const ownerWallet = new ethers.Wallet(OWNER_PRIVATE_KEY, provider);
 
 // ————————————————
 // Simple In-Memory Rate Limiter
@@ -26,6 +24,21 @@ const ipTimestamps = new Map<string, number>();
 // POST /api/request
 // ————————————————
 export async function POST(request: NextRequest) {
+  const RPC_URL = process.env.RPC_URL;
+  const OWNER_PRIVATE_KEY = process.env.PRIVATE_KEY;
+  const FAUCET_AMOUNT = process.env.FAUCET_AMOUNT;
+
+ 
+   if (!RPC_URL || !OWNER_PRIVATE_KEY || !FAUCET_AMOUNT) {
+    return new NextResponse(
+      JSON.stringify({ error: 'Server misconfiguration: missing environment variables.' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const provider = new ethers.JsonRpcProvider(RPC_URL);
+  const ownerWallet = new ethers.Wallet(OWNER_PRIVATE_KEY, provider);
+
   // Only allow POST
   if (request.method !== 'POST') {
     return new NextResponse(JSON.stringify({ error: 'Method not allowed' }), {

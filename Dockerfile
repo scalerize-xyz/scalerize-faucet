@@ -13,6 +13,3 @@ COPY . .
 
 # Build the Next app
 RUN pnpm build
-
-# Serve the production build
-CMD ["pnpm", "start"]
